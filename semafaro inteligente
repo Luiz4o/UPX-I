@@ -1,0 +1,104 @@
+int pintrigger = 7;
+int pinecho = 6;
+
+const byte verde = 4;
+int amarelo = 3;
+int vermelho = 2;
+#define botao 5
+unsigned long time = millis();
+byte status =1; // 0 verde; 1 amarelo; 2 vermelho
+
+int bu= 10;
+
+int tempo = 0;
+int distancia = 0;
+
+void setup()
+{
+  	Serial.begin(9600);
+  	pinMode(vermelho,OUTPUT);
+  	pinMode(amarelo,OUTPUT);
+  	pinMode(verde,OUTPUT);
+  	pinMode(botao, INPUT);
+  	pinMode(botao, INPUT_PULLUP); //Primeiro leva para o alto, dps reverte para baixo
+  	digitalWrite (verde,HIGH);
+  
+	pinMode(pintrigger,OUTPUT);
+	pinMode(pinecho,INPUT);
+	
+  	pinMode (bu, OUTPUT);
+	
+}
+
+void loop()
+{	
+  if(digitalRead(botao)==0 && status==1){
+    amarelof();
+  }
+    
+  if(millis()-time >= 3000 && status==0){
+  verdef();
+  
+  }
+  
+  if(millis()-time >= 3000 && status==1){
+  amarelof();
+  
+  }
+  
+  if(millis()-time >= 3000 && status==2){
+  vermelhof();
+  
+  }	
+  
+	digitalWrite(pintrigger,LOW); //Estabilizar sensor
+	delayMicroseconds(2);
+	digitalWrite(pintrigger,HIGH);
+	delayMicroseconds(10);
+	digitalWrite(pintrigger,LOW);
+
+	tempo = pulseIn(pinecho, HIGH);
+	distancia = tempo * 0.01715;
+
+	Serial.print("Distancia: ");
+	Serial.print(distancia);
+	Serial.println("cm");
+  
+  	delay(500);
+  
+  	if(distancia > 150) {
+	digitalWrite(bu,HIGH);
+	}
+	if(distancia <150){
+ 	digitalWrite(bu, LOW);
+    }
+  
+
+}
+
+void verdef(){
+  digitalWrite(verde, 1);
+  digitalWrite(amarelo, 0);
+  digitalWrite(vermelho, 0);
+  time = millis();
+  status=1;
+  
+}
+
+void amarelof(){
+  digitalWrite(verde, 0);
+  digitalWrite(amarelo, 1);
+  digitalWrite(vermelho, 0);
+  time = millis();
+  status= 2;
+  
+}
+
+void vermelhof(){
+  digitalWrite(verde, 0);
+  digitalWrite(amarelo, 0);
+  digitalWrite(vermelho, 1);
+  time = millis();
+  status=0;
+  
+}
